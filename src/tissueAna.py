@@ -4,8 +4,8 @@
 print("init ...")
 import os
 import sys
-#os.chdir("/hsfscqjf1/st_cq/p21z10200n0096/crc/lizehua/test/lungcancer")
-os.chdir("f:/onedrive/study/biology/stomics/lungcancer_new")
+os.chdir("/hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer")
+#os.chdir("f:/onedrive/study/biology/stomics/lungcancer_new")
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
 
