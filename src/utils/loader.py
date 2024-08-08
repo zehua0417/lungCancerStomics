@@ -10,6 +10,13 @@ def load_data(path_name):
         path = config.genus_path
     elif path_name == "species":
         path = config.species_path
+    elif path_name == "tissue_temp":
+        path = config.tissue_temp_path
+        return st.io.read_h5ad(
+            file_path = path,
+            bin_type = "bins",
+            bin_size = config.bin_size
+        )
     else:
         print("path_name error")
         sys.exit(1)

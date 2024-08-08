@@ -1,5 +1,6 @@
 from matplotlib.backends.backend_pdf import PdfPages
 
+
 class ImgCatcher:
     def __init__(self, filename):
         self.filename = filename
@@ -14,7 +15,7 @@ class ImgCatcher:
     def close(self):
         self.pdf.close()
         del self
-    
+
     def save_and_close(self):
         self.save()
         self.close()

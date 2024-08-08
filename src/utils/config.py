@@ -11,7 +11,6 @@ warnings.filterwarnings('ignore')
 status = "test"  # 测试阶段, bin_size = 50
 debug = False  # 调试, 使用小数据集
 
-
 #* data path *#
 if debug:
     tissue_path = "data/A03982E1_microbiome.genus.label.gem"
@@ -19,6 +18,7 @@ else:
     tissue_path = "data/A03982E1.tissue.gem"
 genus_path = "data/A03982E1_microbiome.genus.label.gem"
 species_path = "data/A03982E1_microbiome.species.label.gem"
+tissue_temp_path = "temp/temp.h5ad"
 
 if not os.path.isfile(tissue_path):
     print(f"文件{tissue_path}不存在")
@@ -80,3 +80,13 @@ n_bins = bin_size
 # PCA
 # 要计算的主成分数量
 n_pcs = 50
+# Leiden
+# 分辨率参数
+# resolution = 1  # 14 clusters
+# resolution = 0.5  # 3 clusters
+resolution = 0.7  # 6 clusters
+
+#* annotation *#
+ref_path = "data/ref.xlsx"
+select_keys = [0, 1, 2, 6, 7, 9, 10, 11, 13, 14, 15, 16, 17, 18, 21, 23],
+marker_num_of_cluster = 10
