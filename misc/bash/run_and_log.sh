@@ -20,11 +20,11 @@ fi
 # 运行 make target
 PYTHONUNBUFFERED=1 "${python}" src/${target}.py > log/${target}.log 2>&1 &
 
-# 创建日志文件 $target.log
-logfile=log/${target}.log
-
 # 获取 target 的进程ID
 target_pid=$!
+
+# 创建日志文件 $target.log
+logfile=log/${target}.log
 
 # 初始化显示文件内容
 clear

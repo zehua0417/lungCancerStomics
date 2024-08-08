@@ -13,7 +13,7 @@ class ImgCatcher:
 
     def close(self):
         self.pdf.close()
-        # del self
+        del self
     
     def save_and_close(self):
         self.save()

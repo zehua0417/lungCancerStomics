@@ -11,6 +11,7 @@ warnings.filterwarnings('ignore')
 status = "test"  # 测试阶段, bin_size = 50
 debug = False  # 调试, 使用小数据集
 
+
 #* data path *#
 if debug:
     tissue_path = "data/A03982E1_microbiome.genus.label.gem"
@@ -64,7 +65,7 @@ mean_umi_gt = 0.1
 #* high variable genes *#
 method = "seurat"  # 'seurat' or 'cell_ranger' or 'seurat_v3'
 # 要保留的顶级高度变异基因的数量
-n_top_genes = None
+n_top_genes = 1500
 # 基因表达值的最小/大正态化离散度
 min_disp = 0.5
 max_disp = np.inf
@@ -74,3 +75,8 @@ max_mean = 3
 # Loess模型拟合中使用的数据比例
 span = 0.3
 n_bins = bin_size
+
+#* Embedding *#
+# PCA
+# 要计算的主成分数量
+n_pcs = 50
