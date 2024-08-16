@@ -10,7 +10,7 @@ warnings.filterwarnings('ignore')
 # status = "dev"	# 开发阶段, bin_size = 100
 status = "test"  # 测试阶段, bin_size = 20
 debug = False  # 调试, 使用小数据集
-use_GPU = True
+use_GPU = False
 
 if use_GPU:
     method = 'rapids'
@@ -48,6 +48,7 @@ if status == "dev":
     bin_size = 100
 else:
     bin_size = 20
+chip_resolution = 500
 
 # * filter cells and genes *#
 # minimum/maximum number of counts required for a cell to pass fitlering.
@@ -91,12 +92,12 @@ n_bins = bin_size
 # * Embedding *#
 # PCA
 # 要计算的主成分数量
-n_pcs = 5
+n_pcs = 3
 # Leiden
 # 分辨率参数
 # resolution = 1  # 14 clusters
 # resolution = 0.5  # 3 clusters
-resolution = 0.75  # 6 clusters
+resolution = 0.2   # 6 clusters
 
 # * annotation *#
 select_keys = [0, 1, 2, 6, 7, 9, 10, 11, 13, 14, 15, 16, 17, 18, 21, 23],

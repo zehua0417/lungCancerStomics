@@ -14,12 +14,12 @@ cell_data = tissue_data.tl.result['annotation']
 # init NMF model
 component = config.nmf_component
 model = NMF(
-		n_components = component,
-		init = 'nndsvd',  # 初始化方法
-		random_state = 123,  # 随机种子
-		max_iter = 1000,  # 最大迭代次数
-		verbose = 0  # 是否打印输出
-		)
+    n_components = component,
+    init = 'nndsvd',  # 初始化方法
+    random_state = 123,  # 随机种子
+    max_iter = 1000,  # 最大迭代次数
+    verbose = 0  # 是否打印输出
+)
 
 # 拟合模型并转换数据
 W = model.fit_transform(cell_data)
@@ -27,15 +27,15 @@ H = model.components_  # 模型的成分矩阵
 
 # 转换为DataFrame
 W_df = pd.DataFrame(
-		W,
-		index = cell_data.index,
-		columns = [f"component_{i}" for i in range(component)]
-		)
+    W,
+    index = cell_data.index,
+    columns = [f"component_{i}" for i in range(component)]
+)
 H_df = pd.DataFrame(
-		H,
-		index = [f"component_{i}" for i in range(component)],
-		columns = cell_data.columns
-		)
+    H,
+    index = [f"component_{i}" for i in range(component)],
+    columns = cell_data.columns
+)
 
 # 保存结果
 W_df.to_csv('out/nmf/W.csv')
@@ -49,4 +49,3 @@ plt.title('NMF Heatmap')
 plt.xlabel('Genes')
 plt.ylabel('Components')
 imgcatcher_heatmap.save_and_close()
-

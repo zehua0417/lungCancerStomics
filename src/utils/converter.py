@@ -1,9 +1,21 @@
+import src.utils.config as config
+
+
 def save_ster2h5ad(data, file, flavor):
     import stereo as st
-    st.io.stereo_to_anndata(
+    return st.io.stereo_to_anndata(
         data,
         flavor=flavor,
         output=file
+    )
+
+
+def conv_adata2ster(data, keys=None):
+    import stereo as st
+    return st.io.anndata_to_stereo(
+        data,
+        spatial_key=keys,
+        resolution=config.chip_resolution
     )
 
 
