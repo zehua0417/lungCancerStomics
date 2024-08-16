@@ -1,26 +1,28 @@
 #!F:/Program\ Data/condaEnvs/stereo/python
-#!/hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/tools/anaconda/envs/stereo/bin/python
+#!/hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/tools/anaconda/envs/stereopy-rapids/bin/python
 
 print("init ...")
-import os
 import sys
+import os
 
-#os.chdir("/hsfscqjf1/st_cq/p21z10200n0096/crc/lizehua/test/lungcancer")
-os.chdir("f:/onedrive/study/biology/stomics/lungcancer")
+os.chdir("/hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer")
+# os.chdir("f:/onedrive/study/biology/stomics/lungcancer")
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
 
-import src.utils.config as config
-import src.utils.loader as loader
-import src.utils.imgcatcher as imgc
+import src.utils.annotation as anno
 import src.utils.filter as ftr
-import src.utils.manual_annotation as ma
+import src.utils.imgcatcher as imgc
+import src.utils.loader as loader
+import src.utils.converter as cvter
+import src.utils.config as config
+
 
 print("loading data ...")
-tissue_data = loader.load_data("tissue")
+tissue_data = loader.load_data("tissue", "gem")
 
 ################ I preprocess ################
-#* 1. calc qc and visualize *#
+# * 1. calc qc and visualize *#
 print("1.1. calc qc and visualize")
 
 tissue_data.tl.cal_qc()
@@ -46,7 +48,7 @@ tissue_data.plt.violin(
 imgcatcher_violin_mt.save_and_close()
 del imgcatcher_violin_mt
 
-#* 2. filter cells and genes *#
+# * 2. filter cells and genes *#
 print("1.2. filtering ...")
 # observe cell distribution
 imgcatcher_scatter = imgc.ImgCatcher('out/preprocess/scatter_gene_count1.pdf')
@@ -68,15 +70,15 @@ tissue_data.tl.filter_cells(
 ftr.filter_zero_mt_cells(tissue_data)
 
 # filter by genes
-tissue_data.tl.filter_genes(
-    min_counts=config.min_gene_counts,
-    max_counts=config.max_gene_counts,
-    min_cells=config.min_cells,
-    max_cells=config.max_cells,
-    mean_umi_gt=config.mean_umi_gt,
-    filter_mt_genes=True,
-    inplace=True
-)
+# tissue_data.tl.filter_genes(
+#     min_counts=config.min_gene_counts,
+#     max_counts=config.max_gene_counts,
+#     min_cells=config.min_cells,
+#     max_cells=config.max_cells,
+#     mean_umi_gt=config.mean_umi_gt,
+#     filter_mt_genes=True,
+#     inplace=True
+# )
 
 # observe cell distribution after filter
 imgcatcher_scatter = imgc.ImgCatcher('out/preprocess/scatter_gene_count2.pdf')
@@ -105,13 +107,15 @@ tissue_data.plt.spatial_scatter()
 imgcatcher_scatter.save_and_close()
 del imgcatcher_scatter
 
+sys.exit(0)
+
 # save data to self.raw
 print("archive data ...")
 tissue_data.tl.raw_checkpoint()
 print("==tissue_data.tl.raw==")
 print(tissue_data.tl.raw)
 
-#* Normalization *#
+# * Normalization *#
 print("1.3. normalization ...")
 tissue_data.tl.normalize_total()
 tissue_data.tl.log1p()
@@ -137,11 +141,11 @@ tissue_data.tl.scale(zero_center=False)
 ################ III Embedding ################
 print("3.1. PCA ...")
 # from sklearn.decomposition import PCA
-# hvgs = tissue_data.tl.result["highly_variable_genes"]['highly_variable']
-# exp_matrix = tissue_data.tl.data.exp_matrix[:, hvgs]
-# pca = PCA(n_components = config.n_pcs)
-# exp_dense = exp_matrix.toarray()
-# fitted = pca.fit(exp_dense)
+# hvgs=tissue_data.tl.result["highly_variable_genes"]['highly_variable']
+# exp_matrix=tissue_data.tl.data.exp_matrix[:, hvgs]
+# pca=PCA(n_components=config.n_pcs)
+# exp_dense=exp_matrix.toarray()
+# fitted=pca.fit(exp_dense)
 # fitted.n_components_
 tissue_data.tl.pca(
     use_highly_genes=True,
@@ -150,29 +154,32 @@ tissue_data.tl.pca(
 )
 tissue_data.tl.neighbors(
     pca_res_key="pca",
-    res_key="neighbors"
+    res_key="neighbors",
+    method=config.method
 )
 
 print("3.2. UMAP ...")
 tissue_data.tl.umap(
     pca_res_key="pca",
     neighbors_res_key="neighbors",
-    res_key="umap"
+    res_key="umap",
+    # method=config.method
 )
 
-imgcatcher_umap = imgc.ImgCatcher('out/umap/umap_gene.pdf')
-tissue_data.plt.umap(
-    gene_names=['AASS'],
-    res_key="umap"
-)
-imgcatcher_umap.save_and_close()
-del imgcatcher_umap
+# imgcatcher_umap=imgc.ImgCatcher('out/umap/umap_gene.pdf')
+# tissue_data.plt.umap(
+#     gene_names=['AASS'],
+#     res_key="umap"
+# )
+# imgcatcher_umap.save_and_close()
+# del imgcatcher_umap
 
 print("3.3. Leiden ...")
 tissue_data.tl.leiden(
-    resolution = config.resolution,
+    resolution=config.resolution,
     neighbors_res_key="neighbors",
-    res_key="leiden"
+    res_key="leiden",
+    method=config.method
 )
 imgcatcher_leiden = imgc.ImgCatcher('out/leiden/leiden.pdf')
 tissue_data.plt.cluster_scatter(
@@ -214,22 +221,48 @@ tissue_data.plt.marker_genes_scatter(
 imgcatcher_marker.save_and_close()
 del imgcatcher_marker
 
-# import stereo as st
-# st.io.stereo_to_anndata(
-#     tissue_data,
-#     output='temp/temp.h5ad'
-# )
+cvter.save_ster2h5ad(tissue_data, 'temp/temp.h5ad', flavor='anndata')
+cvter.save_ster2h5ad(tissue_data, 'temp/temp.h5ad', flavor='seurat')
 # del tissue_data
-# load data
-# tissue_data = loader.load_data("tissue_temp")
+# reload data
+# tissue_data=loader.load_data("tissue_temp", "h5ad")
 
 ################ V Annotation ################
-print("5.1. manual annotation ...")
-ma_obj = ma.ManualAnnotation(
-    st_data = tissue_data,
-    ref_path = config.ref_path,
-    select_keys = config.select_keys,
-    marker_num_of_cluster = config.marker_num_of_cluster
-)
-ma_obj.run()
-del ma_obj
+# print("5.1. manual annotation ...")
+# ma_obj=ma.ManualAnnotation(
+#     st_data=tissue_data,
+#     ref_path=config.ref_path,
+#     select_keys=config.select_keys,
+#     marker_num_of_cluster=config.marker_num_of_cluster
+# )
+# ma_obj.run()
+# del ma_obj
+
+# print("5.2. auto annotation ...")
+# init reference
+# ref=loader.load_data("ref_h5", "h5ad")
+# ref_dict=loader.load_data("ref_dict", "txt.gz")
+# ref_dict=ref_dict[['Index', 'Cell_type.refined']]
+# ref_dict=ref_dict.rename(columns={'Index': 'index', 'Cell_type.refined': 'cell_type'})
+# cell_index=ref.adata.obs.index
+# ref_dict.set_index('index', inplace=True)
+# cell_type_list=[ref_dict.loc[idx, 'cell_type'] if idx in ref_dict.index else None for idx in cell_index]
+# ref.adata.obs['cell_type']=cell_type_list
+#
+# tissue_data.tl.single_r(
+# 	ref,
+# 	ref_use_col='cell_type',
+# 	method=config.method,
+# 	n_jobs=config.singleR_n_jobs,
+# 	fine_tune_times=config.fine_tune_times,
+# 	res_key='annotation'
+# )
+#
+# imgcatcher_annotation =imgc.ImgCatcher('out/annotation/annotation.pdf')
+# tissue_data.plt.cluster_scatter(
+# 	res_key='annotation'
+# )
+# imgcatcher_annotation.save_and_close()
+#
+#
+# 微生物在淋巴结的空间分布

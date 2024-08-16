@@ -1,3 +1,4 @@
+import os
 from matplotlib.backends.backend_pdf import PdfPages
 
 
@@ -7,7 +8,11 @@ class ImgCatcher:
         self.pdf = PdfPages(filename)
 
     def save(self):
+        # Check if the directory exists, if not, create it
         try:
+            directory = os.path.dirname(self.filename)
+            if directory and not os.path.exists(directory):
+                os.makedirs(directory)
             self.pdf.savefig()
         except Exception as e:
             print(f"Error: {e}")

@@ -2,3 +2,4 @@ pandas~=1.5.3
 scanpy~=1.9.6
 numpy~=1.23.5
 matplotlib~=3.7.1
+openpyxl
