@@ -8,7 +8,7 @@ warnings.filterwarnings('ignore')
 
 # * stream control parameters *#
 # status = "dev"	# 开发阶段, bin_size = 100
-status = "test"  # 测试阶段, bin_size = 20
+status = "test"  # 测试阶段, bin_size = 20/50
 debug = False  # 调试, 使用小数据集
 use_GPU = False
 
@@ -28,7 +28,7 @@ tissue_temp_path = "temp/temp.h5ad"
 ref_path = "data/ref.xlsx"  # auto annotation ref file
 ref_gene_path = "data/reference_gene.h5ad"
 reference_path = "data/reference_gene.rds"
-reference_h5_path = "data/reference_gene.h5ad"
+reference_h5_path = "data/12T_harmony_celltype.h5ad"
 reference_dict_path = "data/GSE131907_Lung_Cancer_cell_annotation.txt.gz"
 
 
@@ -51,29 +51,32 @@ else:
 chip_resolution = 500
 
 # * filter cells and genes *#
-# minimum/maximum number of counts required for a cell to pass fitlering.
-# 细胞通过过滤所需的最小/大表达计数
-min_cell_counts = 8     # 300
-max_cell_counts = None  # 3000
-# minimum/maximum number of counts expressed required for a gene to pass filtering.
-# 基因通过过滤所需的最小/大表达计数
-min_gene_counts = None  # 2500
-max_gene_counts = None  # 12500
-# minimum/maximum number of genes expressed required for a cell to pass filtering.
-# 细胞通过过滤所需的最小/大表达基因数
-min_genes = None  # 200
-max_genes = None  # 4300
-# minimum/maximum number of cells expressed required for a gene to pass filering:w
-# .
-# 基因通过过滤所需的最小/大表达细胞数
-min_cells = None
-max_cells = None
-# maximum number of pct_counts_mt required for a cell to pass filtering.
-# 细胞能通过过滤的最大pct_counts_mt
-pct_counts_mt = None  # 1.5
-# mean counts greater than this value for a gene to pass filtering.
-# 基因通过过滤所需的平均表达计数
-mean_umi_gt = None  # 0.1
+# # minimum/maximum number of counts required for a cell to pass fitlering.
+# # 细胞通过过滤所需的最小/大表达计数
+# min_cell_counts = 8     # 300
+# max_cell_counts = None  # 3000
+# # minimum/maximum number of counts expressed required for a gene to pass filtering.
+# # 基因通过过滤所需的最小/大表达计数
+# min_gene_counts = None  # 2500
+# max_gene_counts = None  # 12500
+# # minimum/maximum number of genes expressed required for a cell to pass filtering.
+# # 细胞通过过滤所需的最小/大表达基因数
+# min_genes = None  # 200
+# max_genes = None  # 4300
+# # minimum/maximum number of cells expressed required for a gene to pass filering:w
+# # .
+# # 基因通过过滤所需的最小/大表达细胞数
+# min_cells = None
+# max_cells = None
+# # maximum number of pct_counts_mt required for a cell to pass filtering.
+# # 细胞能通过过滤的最大pct_counts_mt
+# pct_counts_mt = None  # 1.5
+# # mean counts greater than this value for a gene to pass filtering.
+# # 基因通过过滤所需的平均表达计数
+# mean_umi_gt = None  # 0.1
+counts_n_metric = 5
+mt_n_metric = 3
+highest_mt_pct = 8
 
 # * high variable genes *#
 method = "seurat"  # 'seurat' or 'cell_ranger' or 'seurat_v3'

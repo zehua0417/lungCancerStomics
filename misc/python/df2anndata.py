@@ -9,16 +9,16 @@ os.chdir("/hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer")
 
 print('loading data ...')
 print(time.strftime('>> %Y-%m-%d %H:%M:%S', time.localtime(time.time())))
-data = pyreadr.read_r('data/reference_gene.rds')
+data = pyreadr.read_r('data/12T_harmony_celltype.rds')
 data = data[None].transpose()
 print('data loaded')
 print(time.strftime('>> %Y-%m-%d %H:%M:%S', time.localtime(time.time())))
-print(data.head())
-print(data.shape)
 
 # 如果是一个df
 if isinstance(data, pd.DataFrame):
 	print('data is a DataFrame')
+    print(data.head())
+    print(data.shape)
 	# try to convert it to anndata
 	print('try to convert it to anndata')
 	print('>> %Y-%m-%d %H:%M:%S', time.localtime(time.time()))

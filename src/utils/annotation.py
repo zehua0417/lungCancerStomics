@@ -118,4 +118,3 @@ class ManualAnnotation:
 
 sys.stdout = sys.__stdout__
 
-

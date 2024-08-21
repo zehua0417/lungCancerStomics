@@ -75,7 +75,7 @@ class Filter:
         )
         return outlier
 
-    def filter_low_quality_cells(self):
+    def filter_low_quality_cells(self, counts_n_metric, mt_n_metric, highest_mt_pct):
         """
         remove low quality cells
         according to:
@@ -85,13 +85,13 @@ class Filter:
         """
         # filter cells with low quality
         self.adata.obs["outlier"] = (
-                self.is_outlier("log1p_total_counts", 5)
-                | self.is_outlier("log1p_n_genes_by_counts", 5)
-                | self.is_outlier("pct_counts_in_top_20_genes", 5)
+                self.is_outlier("log1p_total_counts", counts_n_metric)
+                | self.is_outlier("log1p_n_genes_by_counts", counts_n_metric)
+                | self.is_outlier("pct_counts_in_top_20_genes", counts_n_metric)
         )
         # filter cells with high mitochondrial gene expression
-        self.adata.obs["mt_outlier"] = self.is_outlier("pct_counts_mt", 5) | (
-                self.adata.obs["pct_counts_mt"] > 8
+        self.adata.obs["mt_outlier"] = self.is_outlier("pct_counts_mt", mt_n_metric) | (
+                self.adata.obs["pct_counts_mt"] > highest_mt_pct
         )
 
         print(self.adata.obs.mt_outlier.value_counts())
