@@ -8,7 +8,15 @@ else
 fi
 
 # 日志文件路径
-logfile=log/${target}.log
+cd /hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer
+if [ -f "log/${target}.log" ]; then
+    logfile="log/${target}.log"
+elif [ -f "./${target}" ]; then
+    logfile="${target}"
+else
+    echo "Error: Neither log/${target}.log nor ./${target} exists." >&2
+    exit 1
+fi
 last_mod_time=$(stat -c %Y "$logfile")
 
 # 初始化显示文件内容
@@ -27,7 +35,7 @@ while true; do
 
     # 检查是否按下 q 键退出
     if read -t 0.1 -n 1 input && [ "$input" = "q" ]; then
-        echo "Exiting python program."
+        echo "Exiting watching program."
         break
     fi
 

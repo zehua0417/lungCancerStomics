@@ -1,8 +1,12 @@
 UNAME_S := $(shell uname -s)
+USERNAME := $(shell whoami)
 
 ifeq ($(UNAME_S), Linux)
 	PLATFORM := linux
-	PYTHON := /hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/tools/anaconda/envs/stereopy-rapids/bin/python
+	ifeq ($(USERNAME), stereonote)
+		PYTHON := python
+	else
+		PYTHON := /hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/tools/anaconda/envs/stereopy-rapids/bin/python
 else ifeq ($(findstring MINGW, $(UNAME_S)), MINGW)
 	PLATFORM := windows
 	PYTHON := F:/Program\ Data/condaEnvs/stereo/python

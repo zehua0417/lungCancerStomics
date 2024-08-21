@@ -1,7 +1,8 @@
 #! /hsfscqjf1/ST_CQ/Reference/hxh/miniconda3/envs/R4.2.1/bin/Rscript
 
 cat("init\n")
-setwd("/hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer")
+# setwd("/hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer")
+setwd("/data/work/lungcancer")
 
 library(data.table)
 library(Matrix)
@@ -13,13 +14,17 @@ library(scater)
 library(scran)
 library(SingleCellExperiment)
 
-use_condaenv(condaenv = "/hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/tools/anaconda/envs/stereopy-rapids/bin/python", require = TRUE)
+config <- import_from_path("config", "src/utils")
+
+fi (config$use != "stereonote"){
+    use_condaenv(condaenv = "/hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/tools/anaconda/envs/stereopy-rapids/bin/python", require = TRUE)
+}
 ad <- import("anndata")
 
 
 cat("1. loading data ...\n")
-adata <- ad$read_h5ad("temp/temp_seurat.h5ad")
-seurat_ref <- readRDS("data/12T_harmony_celltype.rds")
+adata <- ad$read_h5ad(config$tissue_seurat_temp_path)
+seurat_ref <- readRDS(config$reference_rds_path)
 
 expr_matrix <- t(adata$X)
 colnames(expr_matrix) <- as.character(adata$obs_names$tolist())
@@ -59,7 +64,7 @@ gene <- !grepl(
 dec <- modelGeneVar(sce , subset.row = gene)
 
 # 计算高变基因
-hvg <- getTopHVGs(dec, n = 3000)
+hvg <- getTopHVGs(dec, n = config$n_top_genes)
 
 # 加上细胞注释信息
 colLabels(sce) <- colData(sce)$celltype
@@ -106,5 +111,5 @@ res <- SPOTlight(
 )
 
 cat("saving ... \n")
-saveRDS(res, file = "temp/spotlight_results.rds")
+saveRDS(res, file = config$spotlight_res_path)
 
