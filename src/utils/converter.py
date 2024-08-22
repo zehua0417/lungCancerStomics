@@ -2,6 +2,9 @@ import src.utils.config as config
 
 
 def save_ster2h5ad(data, file, flavor):
+    """
+    save stereo data to h5ad file and return anndata object
+    """
     import stereo as st
     return st.io.stereo_to_anndata(
         data,
@@ -11,6 +14,9 @@ def save_ster2h5ad(data, file, flavor):
 
 
 def conv_adata2ster(data, keys=None):
+    """
+    convert AnnData to stereo data
+    """
     import stereo as st
     return st.io.anndata_to_stereo(
         data,
@@ -20,6 +26,9 @@ def conv_adata2ster(data, keys=None):
 
 
 def conv_rds2h5ad(rds_filepath, adata_filepath):
+    """
+    convert rds file to h5ad file
+    """
     import pyreadr
     import anndata
     import sys

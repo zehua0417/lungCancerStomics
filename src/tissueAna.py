@@ -27,7 +27,7 @@ ftr.filter_zero_mt_cells(tissue_data)
 filter_obj = ftr.Filter(tissue_data)
 filter_obj.calc_QC_metric()
 filter_obj.plot_QC_metric("before")
-filter_obj.filter_low_quality_cells(config.counts_n_metric, config.mt_n_metric, config.highest_mt_pct)
+filter_obj.filter_low_quality_cells(config.counts_n_mad, config.mt_n_mad, config.highest_mt_pct)
 filter_obj.plot_QC_metric("after")
 tissue_data = filter_obj.return_st_data()
 
@@ -160,9 +160,9 @@ del tissue_data
 # ma_obj.run()
 # del ma_obj
 
-print("5.2. auto annotation ...")
-# init reference
-ref = loader.load_data("ref_h5", "h5ad")
+# print("5.2. auto annotation ...")
+# # init reference
+# ref = loader.load_data("ref_h5", "h5ad")
 # ref_dict = loader.load_data("ref_dict", "txt.gz")
 # ref_dict = ref_dict[['Index', 'Cell_type.refined']]
 # ref_dict = ref_dict.rename(columns={'Index': 'index', 'Cell_type.refined': 'cell_type'})

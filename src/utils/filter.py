@@ -11,6 +11,7 @@ from src.utils.converter import conv_adata2ster
 def filter_zero_mt_cells(data):
     """
     filter cells with zero mitochondrial gene counts
+    please forgive me for not writing the function in the class
     """
     cal_cells_indicators(data)
     cell_subset = np.ones(data.cells.size, dtype=np.bool8)
@@ -21,9 +22,13 @@ def filter_zero_mt_cells(data):
 class Filter:
     """
     Filter class
+    adata: AnnData object
     """
 
     def __init__(self, data):
+        """
+        data: StereoExpData or AnnData object
+        """
         self.adata = None
         if isinstance(data, StereoExpData):
             self.adata = save_ster2h5ad(data, flavor = "anndata", file = None)
@@ -35,6 +40,7 @@ class Filter:
 
     def calc_QC_metric(self):
         """
+        calculate the QC metric 
         search 3 special genes:
         1. mitochondrial genes
         2. ribosomal genes
@@ -68,14 +74,15 @@ class Filter:
     def is_outlier(self, metric: str, nmads: int):
         """
         detect outliers
+        通过计算数据集中某个指标与中位数之间的偏差，来判断该指标的值是否是异常值。
         """
         M = self.adata.obs[metric]
         outlier = (M < np.median(M) - nmads * median_abs_deviation(M)) | (
-                np.median(M) + nmads * median_abs_deviation(M) < M
+            np.median(M) + nmads * median_abs_deviation(M) < M
         )
         return outlier
 
-    def filter_low_quality_cells(self, counts_n_metric, mt_n_metric, highest_mt_pct):
+    def filter_low_quality_cells(self, counts_n_mad, mt_n_mad, highest_mt_pct):
         """
         remove low quality cells
         according to:
@@ -85,13 +92,13 @@ class Filter:
         """
         # filter cells with low quality
         self.adata.obs["outlier"] = (
-                self.is_outlier("log1p_total_counts", counts_n_metric)
-                | self.is_outlier("log1p_n_genes_by_counts", counts_n_metric)
-                | self.is_outlier("pct_counts_in_top_20_genes", counts_n_metric)
+            self.is_outlier("log1p_total_counts", counts_n_mad)
+            | self.is_outlier("log1p_n_genes_by_counts", counts_n_mad)
+            | self.is_outlier("pct_counts_in_top_20_genes", counts_n_mad)
         )
         # filter cells with high mitochondrial gene expression
-        self.adata.obs["mt_outlier"] = self.is_outlier("pct_counts_mt", mt_n_metric) | (
-                self.adata.obs["pct_counts_mt"] > highest_mt_pct
+        self.adata.obs["mt_outlier"] = self.is_outlier("pct_counts_mt", mt_n_mad) | (
+            self.adata.obs["pct_counts_mt"] > highest_mt_pct
         )
 
         print(self.adata.obs.mt_outlier.value_counts())
@@ -100,7 +107,13 @@ class Filter:
         print(f"Number of cells after filtering of low quality cells: {self.adata.n_obs}")
 
     def return_data(self):
+        """
+        return the filtered data
+        """
         return self.adata
 
     def return_st_data(self):
+        """
+        return the filtered data as StereoExpData object
+        """
         return conv_adata2ster(self.adata, 'spatial')

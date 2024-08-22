@@ -51,15 +51,15 @@ else:
     spotlight_res_path = "temp/spotlight_results.rds"
 
 
-if not os.path.isfile(tissue_path):
-    print(f"文件{tissue_path}不存在")
-    sys.exit(1)
-if not os.path.isfile(genus_path):
-    print(f"文件{genus_path}不存在")
-    sys.exit(1)
-if not os.path.isfile(species_path):
-    print(f"文件{species_path}不存在")
-    sys.exit(1)
+# if not os.path.isfile(tissue_path):
+#     print(f"文件{tissue_path}不存在")
+#     sys.exit(1)
+# if not os.path.isfile(genus_path):
+#     print(f"文件{genus_path}不存在")
+#     sys.exit(1)
+# if not os.path.isfile(species_path):
+#     print(f"文件{species_path}不存在")
+#     sys.exit(1)
 
 ############## parameters ##############
 # * bin_size *#
@@ -93,8 +93,8 @@ chip_resolution = 500
 # # mean counts greater than this value for a gene to pass filtering.
 # # 基因通过过滤所需的平均表达计数
 # mean_umi_gt = None  # 0.1
-counts_n_metric = 5
-mt_n_metric = 3
+counts_n_mad = 5
+mt_n_mad = 3
 highest_mt_pct = 8
 
 # * high variable genes *#

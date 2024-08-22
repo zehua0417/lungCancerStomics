@@ -4,6 +4,11 @@ import sys
 
 # Define a function to load data
 def load_data(path_name, file_type):
+    """
+    load data from the path 
+    @param path_name: str, the path name : tissue, genus, species, ...
+    @param file_type: str, the file type: h5ad, r, gem, txt.gz, ...
+    """
     paths = {
         "tissue": config.tissue_path,
         "genus": config.genus_path,

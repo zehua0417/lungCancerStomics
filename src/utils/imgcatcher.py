@@ -3,6 +3,9 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 
 class ImgCatcher:
+    """
+    Class to save images in a pdf file
+    """
     def __init__(self, filename):
         self.filename = filename
         self.pdf = PdfPages(filename)
