@@ -7,6 +7,7 @@ ifeq ($(UNAME_S), Linux)
 		PYTHON := python
 	else
 		PYTHON := /hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/tools/anaconda/envs/stereopy-rapids/bin/python
+	endif
 else ifeq ($(findstring MINGW, $(UNAME_S)), MINGW)
 	PLATFORM := windows
 	PYTHON := F:/Program\ Data/condaEnvs/stereo/python
@@ -17,12 +18,17 @@ endif
 
 # init dirs
 init:
-	mkdir -p out/{annotation,hvg,leiden,marker,preprocess,temp,umap}
+	mkdir -p out/{annotation,hvg,leiden,marker,preprocess,temp,umap} && \
+	mkdir -p data && \
+	mkdir -p log && \
+	mkdir -p figures && \
+	mkdir -p temp
 
 # ouput platform info
 info:
 	@echo "Platform: $(PLATFORM)"
 	@echo "Python Interpreter: $(PYTHON)"
+	@echo "Username: $(USERNAME)"
 
 install:
 	$(PYTHON) -m pip install -r requirements.txt
