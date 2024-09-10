@@ -2,7 +2,7 @@ import os
 import sys
 import pandas as pd
 import scanpy as sc
-import stereo as st
+# import stereo as st
 
 sys.stdout = None
 
@@ -118,3 +118,63 @@ class ManualAnnotation:
 
 sys.stdout = sys.__stdout__
 
+# cell2location annotation
+class Cell2locAnnotation:
+    """
+    Class for cell2location annotation
+    sapatial_data: annData
+    ref_path: str
+    """
+    def __init__(
+        self,
+        spatial_data,
+        ref_path
+    ):
+        self.spatial_data = spatial_data
+        self.ref_data = sc.read_h5ad(ref_path)
+
+    def train(self):
+        from cell2location.models import RegressionModel
+        from scvi.model import SCVI
+
+        # 初始化和训练单细胞模型
+        sc_model = SCVI(self.ref_data)
+        sc_model.train()
+
+        # 创建参考模型
+        self.reference_model = RegressionModel.from_rna_model(sc_model)
+        self.reference_model.train(self.spatial_data)
+
+    def predict(self):
+        import cell2location
+        # 利用参考模型进行空间组注释
+        self.results = cell2location.run_cell2location(
+            spatial_data=self.spatial_data,
+            reference_model=self.reference_model,
+        )
+    
+    def get_results(self):
+        return self.results
+    
+    def save_results(self, path):
+        self.results.to_csv(path)
+    
+    def plot_heatmap(self, path):
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+        sns.heatmap(
+            self.results.uns["spatial_coefs"],
+            cmap="coolwarm",
+            center=0,
+            cbar_kws={"label": "Coefficient"},
+        )
+        plt.savefig(path)
+
+    def plot_spacial(self, path):
+        sc.pl.spatial(
+            self.spatial_data,
+            color="cell2location",
+            spot_size=10,
+            alpha_img=0.5,
+            save=path
+        )

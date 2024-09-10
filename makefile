@@ -18,7 +18,7 @@ endif
 
 # init dirs
 init:
-	mkdir -p out/{annotation,hvg,leiden,marker,preprocess,temp,umap} && \
+	mkdir -p out/{annotation,hvg,leiden,marker,preprocess,temp,umap,Moran} && \
 	mkdir -p data && \
 	mkdir -p log && \
 	mkdir -p figures && \
@@ -37,6 +37,10 @@ install:
 tissueAna:
 	bash ./misc/bash/run_and_log.sh $(PYTHON) tissueAna
 
+# run microAna
+microAna:
+	bash ./misc/bash/run_and_log.sh $(PYTHON) tissueAna
+
 # reload log monitor
 reload_log:
 	bash ./misc/bash/continue_watch.sh
@@ -47,4 +51,4 @@ up_ti_gpu:
 up_ti:
 	qsub -cwd -l num_proc=32,vf=129G -P P21Z10200N0096 -q st.q /hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer/misc/bash/tissueAna_job.sh -o /hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer/log/tissueAna_o.log -e /hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer/log/tissueAna_e.log
 up_anno_r:
-	qsub -cwd -l num_proc=32,vf=129G -P P21Z10200N0096 -q st.q /hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer/misc/bash/tissueAnno_job.sh -o /hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer/log/tissueAnno_o.log -e /hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer/log/tissueAnno_e.log
+	qsub -cwd -l num_proc=32,vf=512G -P P21Z10200N0096 -q st_supermem.q /hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/test/lungcancer/misc/bash/tissueAnno_job.sh

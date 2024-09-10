@@ -17,138 +17,189 @@ import src.utils.loader as loader
 import src.utils.converter as cvter
 import src.utils.config as config
 
-print("loading data ...")
-tissue_data = loader.load_data("tissue", "gem")
-
-################ I preprocess ################
-tissue_data.tl.cal_qc()
-ftr.filter_zero_mt_cells(tissue_data)
-
-filter_obj = ftr.Filter(tissue_data)
-filter_obj.calc_QC_metric()
-filter_obj.plot_QC_metric("before")
-filter_obj.filter_low_quality_cells(config.counts_n_mad, config.mt_n_mad, config.highest_mt_pct)
-filter_obj.plot_QC_metric("after")
-tissue_data = filter_obj.return_st_data()
-
-del filter_obj
-
-# save data to self.raw
-print("archive data ...")
-tissue_data.tl.raw_checkpoint()
-print("==tissue_data.tl.raw==")
-print(tissue_data.tl.raw)
-
-# * Normalization *#
-print("1.3. normalization ...")
-tissue_data.tl.normalize_total()
-tissue_data.tl.log1p()
-
-################ II High Variability Genes ################
-print("2.1. high variability genes ...")
-tissue_data.tl.highly_variable_genes(
-    n_top_genes=config.n_top_genes,
-    min_disp=config.min_disp,
-    max_disp=config.max_disp,
-    min_mean=config.min_mean,
-    max_mean=config.max_mean,
-    res_key="highly_variable_genes"
-)
-
-imgcatcher_scatter = imgc.ImgCatcher('out/hvg/scatter_hvg1.pdf')
-tissue_data.plt.highly_variable_genes(res_key="highly_variable_genes")
-imgcatcher_scatter.save_and_close()
-del imgcatcher_scatter
-
-tissue_data.tl.scale(zero_center=False)
-
-################ III Embedding ################
-print("3.1. PCA ...")
-tissue_data.tl.pca(
-    use_highly_genes=True,
-    n_pcs=config.n_pcs,
-    res_key="pca"
-)
-img_catcher_elbow = imgc.ImgCatcher('out/umap/elbow.pdf')
-tissue_data.plt.elbow(pca_res_key='pca')
-img_catcher_elbow.save_and_close()
-del img_catcher_elbow
-
-tissue_data.tl.neighbors(
-    pca_res_key="pca",
-    res_key="neighbors",
-    method=config.method
-)
-
-print("3.2. UMAP ...")
-tissue_data.tl.umap(
-    pca_res_key="pca",
-    neighbors_res_key="neighbors",
-    res_key="umap",
-    # method=config.method
-)
-
-# imgcatcher_umap=imgc.ImgCatcher('out/umap/umap_gene.pdf')
+# print("loading data ...")
+# tissue_data = loader.load_data("tissue", "gem")
+# 
+# ################ I preprocess ################
+# tissue_data.tl.cal_qc()
+# # ftr.filter_zero_mt_cells(tissue_data)
+# 
+# # observe cell distribution
+# imgcatcher_scatter = imgc.ImgCatcher('out/preprocess/scatter_gene_count1.pdf')
+# tissue_data.plt.genes_count()
+# imgcatcher_scatter.save_and_close()
+# 
+# # filter by cells
+# tissue_data.tl.filter_cells(
+#     min_counts = config.min_cell_counts,
+#     max_counts = config.max_cell_counts,
+#     min_genes = config.min_genes,
+#     max_genes = config.max_genes,
+#     pct_counts_mt = config.pct_counts_mt,
+#     inplace = True
+# )
+# 
+# # filter zero mt cells
+# ftr.filter_zero_mt_cells(tissue_data)
+# 
+# # filter by genes
+# tissue_data.tl.filter_genes(
+#     min_counts = config.min_gene_counts,
+#     max_counts = config.max_gene_counts,
+#     min_cells = config.min_cells,
+#     max_cells = config.max_cells,
+#     mean_umi_gt = config.mean_umi_gt,
+#     filter_mt_genes = True,
+#     inplace = True
+# )
+# 
+# # observe cell distribution after filter
+# imgcatcher_scatter = imgc.ImgCatcher('out/preprocess/scatter_gene_count2.pdf')
+# tissue_data.plt.genes_count()
+# imgcatcher_scatter.save_and_close()
+# 
+# imgcatcher_violin = imgc.ImgCatcher('out/preprocess/violin_qc2.pdf')
+# tissue_data.plt.violin(
+#     keys = ['n_genes_by_counts', 'total_counts'],
+#     show_stripplot=True
+# )
+# 
+# imgcatcher_violin.save_and_close()
+# 
+# imgcatcher_violin_mt = imgc.ImgCatcher('out/preprocess/violin_qc_mt2.pdf')
+# tissue_data.plt.violin(
+#     keys = ['pct_counts_mt'],
+#     show_stripplot=True
+# )
+# imgcatcher_violin_mt.save_and_close()
+# 
+# imgcatcher_scatter = imgc.ImgCatcher('out/preprocess/scatter_qc2.pdf')
+# tissue_data.plt.spatial_scatter()
+# imgcatcher_scatter.save_and_close()
+# 
+# # filter_obj = ftr.Filter(tissue_data)
+# # filter_obj.calc_QC_metric()
+# # filter_obj.plot_QC_metric("before")
+# # filter_obj.filter_low_quality_cells(config.counts_n_mad, config.mt_n_mad, config.highest_mt_pct)
+# # filter_obj.plot_QC_metric("after")
+# # tissue_data = filter_obj.return_st_data()
+# # del filter_obj
+# 
+# # save data to self.raw
+# print("archive data ...")
+# tissue_data.tl.raw_checkpoint()
+# print("==tissue_data.tl.raw==")
+# print(tissue_data.tl.raw)
+# 
+# # * Normalization *#
+# print("1.3. normalization ...")
+# tissue_data.tl.normalize_total()
+# tissue_data.tl.log1p()
+# 
+# ################ II High Variability Genes ################
+# print("2.1. high variability genes ...")
+# tissue_data.tl.highly_variable_genes(
+#     n_top_genes=config.n_top_genes,
+#     min_disp=config.min_disp,
+#     max_disp=config.max_disp,
+#     min_mean=config.min_mean,
+#     max_mean=config.max_mean,
+#     res_key="highly_variable_genes"
+# )
+# 
+# imgcatcher_scatter = imgc.ImgCatcher('out/hvg/scatter_hvg1.pdf')
+# tissue_data.plt.highly_variable_genes(res_key="highly_variable_genes")
+# imgcatcher_scatter.save_and_close()
+# del imgcatcher_scatter
+# 
+# tissue_data.tl.scale(zero_center=False)
+# 
+# ################ III Embedding ################
+# print("3.1. PCA ...")
+# tissue_data.tl.pca(
+#     use_highly_genes=True,
+#     n_pcs=config.n_pcs,
+#     res_key="pca"
+# )
+# img_catcher_elbow = imgc.ImgCatcher('out/umap/elbow.pdf')
+# tissue_data.plt.elbow(pca_res_key='pca')
+# img_catcher_elbow.save_and_close()
+# del img_catcher_elbow
+# 
+# tissue_data.tl.neighbors(
+#     pca_res_key="pca",
+#     res_key="neighbors",
+#     method=config.method
+# )
+# 
+# print("3.2. UMAP ...")
+# tissue_data.tl.umap(
+#     pca_res_key="pca",
+#     neighbors_res_key="neighbors",
+#     res_key="umap",
+#     # method=config.method
+# )
+# 
+# # imgcatcher_umap=imgc.ImgCatcher('out/umap/umap_gene.pdf')
+# # tissue_data.plt.umap(
+# #     gene_names=['AASS'],
+# #     res_key="umap"
+# # )
+# # imgcatcher_umap.save_and_close()
+# # del imgcatcher_umap
+# 
+# print("3.3. Leiden ...")
+# tissue_data.tl.leiden(
+#     resolution=config.resolution,
+#     neighbors_res_key="neighbors",
+#     res_key="leiden",
+#     method=config.method
+# )
+# imgcatcher_leiden = imgc.ImgCatcher('out/leiden/leiden.pdf')
+# tissue_data.plt.cluster_scatter(
+#     res_key="leiden"
+# )
+# imgcatcher_leiden.save_and_close()
+# del imgcatcher_leiden
+# imgcatcher_umap = imgc.ImgCatcher('out/umap/umap.pdf')
 # tissue_data.plt.umap(
-#     gene_names=['AASS'],
-#     res_key="umap"
+#     res_key="umap",
+#     cluster_key="leiden"
 # )
 # imgcatcher_umap.save_and_close()
 # del imgcatcher_umap
-
-print("3.3. Leiden ...")
-tissue_data.tl.leiden(
-    resolution=config.resolution,
-    neighbors_res_key="neighbors",
-    res_key="leiden",
-    method=config.method
-)
-imgcatcher_leiden = imgc.ImgCatcher('out/leiden/leiden.pdf')
-tissue_data.plt.cluster_scatter(
-    res_key="leiden"
-)
-imgcatcher_leiden.save_and_close()
-del imgcatcher_leiden
-imgcatcher_umap = imgc.ImgCatcher('out/umap/umap.pdf')
-tissue_data.plt.umap(
-    res_key="umap",
-    cluster_key="leiden"
-)
-imgcatcher_umap.save_and_close()
-del imgcatcher_umap
-
-################ IV Find Marker genes ################
-print("4.1. marker genes ...")
-tissue_data.tl.find_marker_genes(
-    cluster_res_key="leiden",
-    method="wilcoxon_test",
-    use_highly_genes=True
-)
-
-# print top 10 marker genes score
-imgcatcher_marker = imgc.ImgCatcher('out/marker/genes_text.pdf')
-tissue_data.plt.marker_genes_text(
-    res_key='marker_genes',
-    markers_num=10,
-    sort_key='scores'
-)
-imgcatcher_marker.save_and_close()
-del imgcatcher_marker
-# scat top 10 marker genes of each cluster
-imgcatcher_marker = imgc.ImgCatcher('out/marker/genes_scatter.pdf')
-tissue_data.plt.marker_genes_scatter(
-    res_key='marker_genes',
-    markers_num=10
-)
-imgcatcher_marker.save_and_close()
-del imgcatcher_marker
-
-cvter.save_ster2h5ad(tissue_data, 'temp/temp.h5ad', flavor='anndata')
-cvter.save_ster2h5ad(tissue_data, 'temp/temp_seurat.h5ad', flavor='seurat')
-del tissue_data
+# 
+# ################ IV Find Marker genes ################
+# print("4.1. marker genes ...")
+# tissue_data.tl.find_marker_genes(
+#     cluster_res_key="leiden",
+#     method="wilcoxon_test",
+#     use_highly_genes=True
+# )
+# 
+# # print top 10 marker genes score
+# imgcatcher_marker = imgc.ImgCatcher('out/marker/genes_text.pdf')
+# tissue_data.plt.marker_genes_text(
+#     res_key='marker_genes',
+#     markers_num=10,
+#     sort_key='scores'
+# )
+# imgcatcher_marker.save_and_close()
+# del imgcatcher_marker
+# # scat top 10 marker genes of each cluster
+# imgcatcher_marker = imgc.ImgCatcher('out/marker/genes_scatter.pdf')
+# tissue_data.plt.marker_genes_scatter(
+#     res_key='marker_genes',
+#     markers_num=10
+# )
+# imgcatcher_marker.save_and_close()
+# del imgcatcher_marker
+# 
+# cvter.save_ster2h5ad(tissue_data, 'temp/temp.h5ad', flavor='anndata')
+# cvter.save_ster2h5ad(tissue_data, 'temp/temp_seurat.h5ad', flavor='seurat')
+# del tissue_data
 # reload data
 # tissue_data = loader.load_data("tissue_temp", "h5ad")
-
 ################ V Annotation ################
 # print("5.1. manual annotation ...")
 # ma_obj=anno.ManualAnnotation(
@@ -160,7 +211,7 @@ del tissue_data
 # ma_obj.run()
 # del ma_obj
 
-# print("5.2. auto annotation ...")
+# print("5.2. singleR auto annotation ...")
 # # init reference
 # ref = loader.load_data("ref_h5", "h5ad")
 # ref_dict = loader.load_data("ref_dict", "txt.gz")
@@ -185,4 +236,19 @@ del tissue_data
 #     res_key='annotation'
 # )
 # imgcatcher_annotation.save_and_close()
+
+# print("5.2. spotlight auto annotation ...")
+# # Rscript run src/annotation.R
+# os.system("Rscript src/annotation.R")
+
+# print("5.2 cell2location auto annotation ...")
+# import scanpy as sc
+# cell2loc = anno.Cell2locAnnotation(
+#     sc.read_h5ad(config.tissue_temp_path),
+#     config.reference_h5_path
+# )
+# cell2loc.train()
+# cell2loc.predict()
+# cell2loc.save_result(config.cell2location_res_path)
+# cell2loc.plot_spacial("out/annotation/cell2location.png")
 

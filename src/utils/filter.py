@@ -80,6 +80,10 @@ class Filter:
         outlier = (M < np.median(M) - nmads * median_abs_deviation(M)) | (
             np.median(M) + nmads * median_abs_deviation(M) < M
         )
+        print(f"Number of outliers in {metric}: {outlier.sum()}")
+        print(f"Percentage of outliers in {metric}: {outlier.sum() / len(outlier)}")
+        print(f"Lower bound: {np.median(M) - nmads * median_abs_deviation(M)}")
+        print(f"Upper bound: {np.median(M) + nmads * median_abs_deviation(M)}")
         return outlier
 
     def filter_low_quality_cells(self, counts_n_mad, mt_n_mad, highest_mt_pct):
@@ -94,7 +98,7 @@ class Filter:
         self.adata.obs["outlier"] = (
             self.is_outlier("log1p_total_counts", counts_n_mad)
             | self.is_outlier("log1p_n_genes_by_counts", counts_n_mad)
-            | self.is_outlier("pct_counts_in_top_20_genes", counts_n_mad)
+            #| self.is_outlier("pct_counts_in_top_20_genes", counts_n_mad)
         )
         # filter cells with high mitochondrial gene expression
         self.adata.obs["mt_outlier"] = self.is_outlier("pct_counts_mt", mt_n_mad) | (

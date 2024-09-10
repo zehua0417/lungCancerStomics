@@ -1,4 +1,4 @@
-#! /hsfscqjf1/ST_CQ/P21Z10200N0096/CRC/lizehua/tools/anaconda/envs/r_env/bin/R
+#! /hsfscqjf1/ST_CQ/Reference/hxh/miniconda3/envs/R4.2.1/bin/R
 
 library(anndata)
 library(sceasy)

@@ -7,6 +7,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 user_name = os.getlogin()
+system = "HPC" # "DCS"
 
 # * stream control parameters *#
 # status = "dev"	# 开发阶段, bin_size = 100
@@ -20,20 +21,21 @@ else:
     method = None
 
 # * data path *#
-if user_name == "stereonote":  # which means on DCS cloud
+if system == "DCS":
     tissue_path = "/data/input/Files/A03982E1/A03982E1.tissue.gem.gz"
     genus_path = "/data/input/Files/A03982E1/A03982E1.microbiome.genus.label.gem"
     species_path = "/data/input/Files/A03982E1/A03982E1.microbiome.species.label.gem"
     tissue_temp_path = "/data/input/Files/lizehua/temp.h5ad"
-    tissue_seurat_temp_path = "/data/input/Files/lizehua/temp_seurat.h5ad"
+    tissue_seurat_temp_path = "/data/input/Files/lizehua/temp_seurat.rds"
     ref_path = "/data/input/Files/lizehua/ref.xlsx"  # auto annotation ref file
     ref_gene_path = "/data/input/Files/lizehua/reference_gene.h5ad"
     reference_path = "/data/input/Files/lizehua/reference_gene.rds"
     reference_h5_path = "/data/input/Files/lizehua/12T_harmony_celltype.h5ad"
     reference_rds_path = "/data/input/Files/lizehua/12T_harmony_celltype.rds"
     reference_dict_path = "/data/input/Files/lizehua/GSE131907_Lung_Cancer_cell_annotation.txt.gz"
-    spotlight_res_path = "/data/input/Files/lizehua/spotlight_results.rds"
-else:
+    spotlight_res_path = "out/annotation/tissue_anno.csv"
+    cell2location_res_path = "out/annotation/cell2location_anno.csv"
+elif system == "HPC":
     if debug:
         tissue_path = "data/A03982E1_microbiome.genus.label.gem"
     else:
@@ -48,7 +50,11 @@ else:
     reference_h5_path = "data/12T_harmony_celltype.h5ad"
     reference_rds_path = "data/12T_harmony_celltype.rds"
     reference_dict_path = "data/GSE131907_Lung_Cancer_cell_annotation.txt.gz"
-    spotlight_res_path = "temp/spotlight_results.rds"
+    spotlight_res_path = "out/annotation/tissue_anno.csv"
+    cell2location_res_path = "out/annotation/cell2location_anno.csv"
+else:
+    print(f"未知的系统{system}")
+    sys.exit(1)
 
 
 # if not os.path.isfile(tissue_path):
@@ -70,31 +76,34 @@ else:
 chip_resolution = 500
 
 # * filter cells and genes *#
-# # minimum/maximum number of counts required for a cell to pass fitlering.
-# # 细胞通过过滤所需的最小/大表达计数
-# min_cell_counts = 8     # 300
-# max_cell_counts = None  # 3000
-# # minimum/maximum number of counts expressed required for a gene to pass filtering.
-# # 基因通过过滤所需的最小/大表达计数
-# min_gene_counts = None  # 2500
-# max_gene_counts = None  # 12500
-# # minimum/maximum number of genes expressed required for a cell to pass filtering.
-# # 细胞通过过滤所需的最小/大表达基因数
-# min_genes = None  # 200
-# max_genes = None  # 4300
-# # minimum/maximum number of cells expressed required for a gene to pass filering:w
-# # .
-# # 基因通过过滤所需的最小/大表达细胞数
-# min_cells = None
-# max_cells = None
-# # maximum number of pct_counts_mt required for a cell to pass filtering.
-# # 细胞能通过过滤的最大pct_counts_mt
-# pct_counts_mt = None  # 1.5
-# # mean counts greater than this value for a gene to pass filtering.
-# # 基因通过过滤所需的平均表达计数
-# mean_umi_gt = None  # 0.1
+# minimum/maximum number of counts required for a cell to pass fitlering.
+# 细胞通过过滤所需的最小/大表达计数
+min_cell_counts = 50    # 300
+max_cell_counts = 600   # 3000
+# minimum/maximum number of counts expressed required for a gene to pass filtering.
+# 基因通过过滤所需的最小/大表达计数
+min_gene_counts = None  # 2500
+max_gene_counts = None  # 12500
+# minimum/maximum number of genes expressed required for a cell to pass filtering.
+# 细胞通过过滤所需的最小/大表达基因数
+min_genes = 50    # 200
+max_genes = 5000  # 4300
+# minimum/maximum number of cells expressed required for a gene to pass filering:w
+# .
+# 基因通过过滤所需的最小/大表达细胞数
+min_cells = None
+max_cells = None
+# maximum number of pct_counts_mt required for a cell to pass filtering.
+# 细胞能通过过滤的最大pct_counts_mt
+pct_counts_mt = 5  # 1.5
+# mean counts greater than this value for a gene to pass filtering.
+# 基因通过过滤所需的平均表达计数
+mean_umi_gt = None  # 0.1
+# counts的最大平均绝对偏差
 counts_n_mad = 5
+# mt pct的最大平均绝对偏差
 mt_n_mad = 3
+# mt的最大占比
 highest_mt_pct = 8
 
 # * high variable genes *#
@@ -114,7 +123,7 @@ n_bins = bin_size
 # * Embedding *#
 # PCA
 # 要计算的主成分数量
-n_pcs = 3
+n_pcs = 15
 # Leiden
 # 分辨率参数
 # resolution = 1  # 14 clusters
@@ -127,3 +136,4 @@ marker_num_of_cluster = 10
 
 fine_tune_times = 5
 singleR_n_jobs = 16
+
